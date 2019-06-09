@@ -7,7 +7,8 @@ def select_ap_group():
     try:
         group_name = resnet_ap_group_list[ap_group -1]
     except (IndexError, LookupError, ValueError):
-        print(int(input("Please enter a valid number: ")))
+        print("Please enter a valid number.")
+        select_ap_group()
     while invalid == True:
         try:
             response_valid = input("You chose the AP Group name %s, are you sure? (y/N): " % (group_name))
@@ -17,7 +18,7 @@ def select_ap_group():
             elif response_valid == "N":
                 select_ap_group()
         except:
-            break
+            continue
 
 # Function to print list of CLI commands that change AP name and AP group
 def print_cli_commands():
