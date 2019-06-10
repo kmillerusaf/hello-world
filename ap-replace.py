@@ -21,63 +21,72 @@ import sys
 #        except:
 #            continue
 
-def select_ap_group():
-    ap_group = int(input("AP Group? Choose a number: "))
-    while True:
-        try:
-            group_name = resnet_ap_group_list[ap_group -1]
-            break
-        except (IndexError, LookupError, ValueError):
-            ap_group = int(input(("Please enter a valid number: ")))
-    while True:
-        if group_name not in resnet_ap_group_list[ap_group -1]:
-            ap_group = int(input("AP Group? Choose a number: "))
-        else:
-            break
+
+def select_ap_group(ap_group_dict):
+    ap_group = input("AP Group? Choose a number: ")
+    while ap_group not in ap_group_dict.keys():
+        ap_group = input("Invalid number. Please enter a valid number: ")
+    group_name = ap_group_dict[ap_group]
+    print(group_name)
     while True:
         check_group = input("You selected %s, are you sure? (y/N): " % (group_name))
-        if check_group == "y":
+        if check_group.upper() in "YES":
             invalid = False
             return group_name
-        elif check_group == "N":
+        elif check_group.upper() in "NO":
             sys.exit()
         else:
             continue
 
 
 # Function to print list of CLI commands that change AP name and AP group
-def print_cli_commands():
-    group_name = select_ap_group()
-    with open('/Users/keithmiller/Work/ib-import-carmichael06062019.csv', mode='r') as input_file:
+def print_cli_commands(ap_group_dict):
+    group_name = select_ap_group(ap_group_dict)
+    with open(
+        "/Users/keithmiller/Work/ib-import-carmichael06062019.csv", mode="r"
+    ) as input_file:
         reader = csv.reader(input_file)
         list = []
-        print("""
+        print(
+            """
         !!! Printing CLI comnmands !!!
-
-        """)
+        """
+        )
         for row in reader:
             list.append(row)
         for row in list[1:]:
-            print("ap-rename ap-name %s %s" % (row[2],row[3]))
-            print("ap-regroup ap-name %s %s" % (row[3],group_name))
+            print("ap-rename ap-name %s %s" % (row[2], row[3]))
+            print("ap-regroup ap-name %s %s" % (row[3], group_name))
 
 
-# Pull list of ResNET AP Groups from file and create a list
-ap_group_file = open('/Users/keithmiller/Work/resnet-ap-groups.txt', mode='r')
-resnet_ap_group_list = (ap_group_file.read().splitlines())
-ap_group_file.close()
+def main():
+    # Pull list of ResNET AP Groups from file and create a list
+    ap_group_file = open("groups.txt", mode="r")
+    lines = ap_group_file.read().splitlines()
+    resnet_ap_group_list = []
+    for line in lines:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        resnet_ap_group_list.append(line)
+    print(resnet_ap_group_list)
+    ap_group_file.close()
 
-# Create empty list to give AP Groups a number and set starting number to 1
-numbered_ap_groups = []
-count = 1
+    # Create empty list to give AP Groups a number and set starting number to 1
+    ap_group_dict = {}
+    count = 1
 
-# Loop through AP Group list and append/increment number string to group names
-for group in resnet_ap_group_list:
-    numbered_ap_groups.append("%s. %s" % (count,group))
-    count += 1
+    # Loop through AP Group list and append/increment number string to group names
+    for group in resnet_ap_group_list:
+        ap_group_dict[str(count)] = group
+        count += 1
 
-# Print list of numbered AP groups
-for option in numbered_ap_groups:
-    print(option)
+    # Print list of numbered AP groups
+    for k, v in ap_group_dict.items():
+        print("%s. %s" % (k, v))
 
-print_cli_commands()
+    print_cli_commands(ap_group_dict)
+
+
+if __name__ == "__main__":
+    main()
