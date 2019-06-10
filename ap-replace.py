@@ -1,24 +1,49 @@
 import csv
+import sys
 
 # Function to ask user which AP group to select
+# def select_ap_group():
+#    invalid = True
+#    ap_group = int(input("What AP Group should the APs belong to? (Select a number from above): "))
+#    try:
+#        group_name = resnet_ap_group_list[ap_group -1]
+#    except (IndexError, LookupError, ValueError):
+#        print("Please enter a valid number.")
+#        select_ap_group()
+#    while invalid == True:
+#        try:
+#            response_valid = input("You chose the AP Group name %s, are you sure? (y/N): " % (group_name))
+#            if response_valid == "y":
+#                return group_name
+#                invalid = False
+#            elif response_valid == "N":
+#                select_ap_group()
+#        except:
+#            continue
+
 def select_ap_group():
-    invalid = True
-    ap_group = int(input("What AP Group should the APs belong to? (Select a number from above): "))
-    try:
-        group_name = resnet_ap_group_list[ap_group -1]
-    except (IndexError, LookupError, ValueError):
-        print("Please enter a valid number.")
-        select_ap_group()
-    while invalid == True:
+    ap_group = int(input("AP Group? Choose a number: "))
+    while True:
         try:
-            response_valid = input("You chose the AP Group name %s, are you sure? (y/N): " % (group_name))
-            if response_valid == "y":
-                return group_name
-                invalid = False
-            elif response_valid == "N":
-                select_ap_group()
-        except:
+            group_name = resnet_ap_group_list[ap_group -1]
+            break
+        except (IndexError, LookupError, ValueError):
+            ap_group = int(input(("Please enter a valid number: ")))
+    while True:
+        if group_name not in resnet_ap_group_list[ap_group -1]:
+            ap_group = int(input("AP Group? Choose a number: "))
+        else:
+            break
+    while True:
+        check_group = input("You selected %s, are you sure? (y/N): " % (group_name))
+        if check_group == "y":
+            invalid = False
+            return group_name
+        elif check_group == "N":
+            sys.exit()
+        else:
             continue
+
 
 # Function to print list of CLI commands that change AP name and AP group
 def print_cli_commands():
@@ -35,6 +60,7 @@ def print_cli_commands():
         for row in list[1:]:
             print("ap-rename ap-name %s %s" % (row[2],row[3]))
             print("ap-regroup ap-name %s %s" % (row[3],group_name))
+
 
 # Pull list of ResNET AP Groups from file and create a list
 ap_group_file = open('/Users/keithmiller/Work/resnet-ap-groups.txt', mode='r')
